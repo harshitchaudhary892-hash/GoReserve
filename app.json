@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Go Reserve",
+    "slug": "GoReserve",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#E53935"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Go Reserve needs your location to show nearby hotels, restaurants, and resorts.",
+        "NSLocationAlwaysUsageDescription": "Go Reserve needs your location to show nearby places."
+      },
+      "bundleIdentifier": "com.goreserve.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E53935",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "INTERNET"
+      ],
+      "package": "com.goreserve.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Go Reserve needs your location to show nearby places."
+        }
+      ]
+    ]
+  }
+}
