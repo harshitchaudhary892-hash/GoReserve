@@ -1,29 +1,11 @@
-import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, startAfter, DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, updateDoc, query, where, orderBy, limit, startAfter, DocumentSnapshot, QueryDocumentSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Place } from '../types';
-
-const PLACES_COLLECTION = 'places';
-
-const convertDoc = (docSnapshot: QueryDocumentSnapshot): Place => {
-  const data = docSnapshot.data();
-  return {
-    id: docSnapshot.id, name: data.name || '', category: data.category || 'Hotel', address: data.address || '',
-    city: data.city || '', state: data.state || '', latitude: data.latitude || 0, longitude: data.longitude || 0,
-    phone: data.phone || '', description: data.description || '', rating: data.rating || 0,
-    priceRange: data.priceRange || '$', imageUrl: data.imageUrl || '', amenities: data.amenities || [],
-    availability: data.availability || 'Open', createdAt: data.createdAt, updatedAt: data.updatedAt,
-  };
-};
-
-export const getPlaces = async (pageSize: number = 20, lastDoc?: DocumentSnapshot): Promise<{ places: Place[]; lastVisible: DocumentSnapshot | null }> => {
-  const q = lastDoc ? query(collection(db, PLACES_COLLECTION), orderBy('name'), startAfter(lastDoc), limit(pageSize)) : query(collection(db, PLACES_COLLECTION), orderBy('name'), limit(pageSize));
-  const snapshot = await getDocs(q);
-  return { places: snapshot.docs.map(convertDoc), lastVisible: snapshot.docs[snapshot.docs.length - 1] || null };
-};
-
-export const getPlaceById = async (id: string): Promise<Place | null> => {
-  const docRef = doc(db, PLACES_COLLECTION, id);
-  const docSnap = await getDoc(docRef);
-  if (!docSnap.exists()) return null;
-  return convertDoc(docSnap as QueryDocumentSnapshot);
-};
+const PC = 'places';
+const cv = (d: QueryDocumentSnapshot): Place => { const dt = d.data(); return { id: d.id, name: dt.name||'', category: dt.category||'Hotel', address: dt.address||'', city: dt.city||'', state: dt.state||'', latitude: dt.latitude||0, longitude: dt.longitude||0, phone: dt.phone||'', description: dt.description||'', rating: dt.rating||0, priceRange: dt.priceRange||'$', imageUrl: dt.imageUrl||'', amenities: dt.amenities||[], availability: dt.availability||'Open', createdAt: dt.createdAt, updatedAt: dt.updatedAt }; };
+export const getPlaces = async (ps=20, ld?: DocumentSnapshot) => { const q = ld ? query(collection(db,PC),orderBy('name'),startAfter(ld),limit(ps)) : query(collection(db,PC),orderBy('name'),limit(ps)); const sn = await getDocs(q); return { places: sn.docs.map(cv), lastVisible: sn.docs[sn.docs.length-1]||null }; };
+export const getPlaceById = async (id: string): Promise<Place|null> => { const ds = await getDoc(doc(db,PC,id)); if(!ds.exists())return null; return cv(ds as QueryDocumentSnapshot); };
+export const getPlacesByCategory = async (cat: Place['category'], ps=20, ld?: DocumentSnapshot) => { const bq = query(collection(db,PC),where('category','==',cat),orderBy('rating','desc')); const q = ld ? query(bq,startAfter(ld),limit(ps)) : query(bq,limit(ps)); const sn = await getDocs(q); return { places: sn.docs.map(cv), lastVisible: sn.docs[sn.docs.length-1]||null }; };
+export const searchPlaces = async (st: string, f?: { category?: string; priceRange?: string; availability?: string; minRating?: number; }): Promise<Place[]> => { let q = query(collection(db,PC),orderBy('name')); if(f?.category&&f.category!=='All') q = query(collection(db,PC),where('category','==',f.category),orderBy('name')); const sn = await getDocs(q); let places = sn.docs.map(cv); const sl = st.toLowerCase(); return places.filter(p => { const ms = !st||p.name.toLowerCase().includes(sl)||p.city.toLowerCase().includes(sl)||p.state.toLowerCase().includes(sl)||p.address.toLowerCase().includes(sl); const mp = !f?.priceRange||f.priceRange==='All'||p.priceRange===f.priceRange; const ma = !f?.availability||f.availability==='All'||p.availability===f.availability; const mr = !f?.minRating||p.rating>=f.minRating; return ms&&mp&&ma&&mr; }); };
+export const addPlace = async (place: Omit<Place,'id'|'createdAt'|'updatedAt'>): Promise<string> => { const dr = await addDoc(collection(db,PC),{...place,createdAt:Timestamp.now(),updatedAt:Timestamp.now()}); return dr.id; };
+export const updatePlace = async (id: string, data: Partial<Place>): Promise<void> => { await updateDoc(doc(db,PC,id),{...data,updatedAt:Timestamp.now()}); };
