@@ -29,24 +29,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleLogin = async () => {
     if (!validate()) return;
     setLoading(true);
-    try {
-      await signIn(email.trim(), password);
-    } catch (error: any) {
-      let message = 'Login failed. Please try again.';
+    try { await signIn(email.trim(), password); }
+    catch (error: any) {
+      let message = 'Login failed.';
       if (error.code === 'auth/user-not-found') message = 'No account found with this email';
       else if (error.code === 'auth/wrong-password') message = 'Incorrect password';
       else if (error.code === 'auth/invalid-email') message = 'Invalid email address';
-      else if (error.code === 'auth/too-many-requests') message = 'Too many attempts. Please try again later.';
       Alert.alert('Login Error', message);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Text style={styles.logoIcon}>🏨</Text>
           <Text style={styles.title}>Welcome Back</Text>
