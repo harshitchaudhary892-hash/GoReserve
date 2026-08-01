@@ -21,15 +21,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [signingOut, setSigningOut] = useState(false);
 
   const handleSave = useCallback(async () => {
-    if (!user || !displayName.trim()) return;
-    setSaving(true);
-    try { await updateUserProfile(user.uid, { displayName: displayName.trim(), phone: phone.trim() || undefined }); await refreshUserProfile(); setEditing(false); Alert.alert('Success', 'Profile updated.'); }
-    catch (error) { Alert.alert('Error', 'Failed to update profile.'); }
-    finally { setSaving(false); }
+    if (!user || !displayName.trim()) return; setSaving(true);
+    try { await updateUserProfile(user.uid, { displayName: displayName.trim(), phone: phone.trim() || undefined }); await refreshUserProfile(); setEditing(false); Alert.alert('Success', 'Profile updated successfully.'); } catch (e) { Alert.alert('Error', 'Failed to update profile.'); } finally { setSaving(false); }
   }, [user, displayName, phone]);
 
   const handleSignOut = useCallback(async () => {
-    Alert.alert('Sign Out', 'Are you sure?', [{ text: 'Cancel', style: 'cancel' }, { text: 'Sign Out', style: 'destructive', onPress: async () => { setSigningOut(true); try { await signOut(); } catch (error) { Alert.alert('Error', 'Failed to sign out.'); setSigningOut(false); } } }]);
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [{ text: 'Cancel', style: 'cancel' }, { text: 'Sign Out', style: 'destructive', onPress: async () => { setSigningOut(true); try { await signOut(); } catch (e) { Alert.alert('Error', 'Failed to sign out.'); setSigningOut(false); } } }]);
   }, [signOut]);
 
   return (
@@ -37,14 +34,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.profileHeader}>
-          <View style={styles.avatarContainer}>
-            {userProfile?.photoURL ? <Image source={{ uri: userProfile.photoURL }} style={styles.avatar} /> : <View style={styles.avatarPlaceholder}><Text style={styles.avatarText}>{getInitials(userProfile?.displayName || user?.displayName || 'User')}</Text></View>}
-          </View>
+          <View style={styles.avatarContainer}>{userProfile?.photoURL ? <Image source={{ uri: userProfile.photoURL }} style={styles.avatar} /> : <View style={styles.avatarPlaceholder}><Text style={styles.avatarText}>{getInitials(userProfile?.displayName || user?.displayName || 'User')}</Text></View>}</View>
           <Text style={styles.displayName}>{userProfile?.displayName || user?.displayName || 'User'}</Text>
           <Text style={styles.email}>{user?.email}</Text>
           <View style={styles.stats}><View style={styles.statItem}><Text style={styles.statNumber}>{userProfile?.favorites?.length || 0}</Text><Text style={styles.statLabel}>Favorites</Text></View></View>
         </View>
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account Information</Text>
           {editing ? (
@@ -61,12 +55,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             </View>
           )}
         </View>
-
-        <View style={styles.section}><Text style={styles.sectionTitle}>Quick Links</Text><TouchableOpacity style={styles.linkCard} onPress={() => navigation.navigate('Favorites')}><Ionicons name="heart-outline" size={20} color={COLORS.heart} /><Text style={styles.linkText}>My Favorites</Text><Text style={styles.linkCount}>{userProfile?.favorites?.length || 0}</Text><Ionicons name="chevron-forward" size={18} color={COLORS.textLight} /></TouchableOpacity></View>
-
-        <View style={styles.section}><Text style={styles.sectionTitle}>About</Text><View style={styles.infoCard}><Ionicons name="information-circle-outline" size={20} color={COLORS.primary} /><View style={styles.infoContent}><Text style={styles.infoLabel}>App Version</Text><Text style={styles.infoValue}>1.0.0</Text></View></View><View style={styles.infoCard}><Ionicons name="cloud-done-outline" size={20} color={COLORS.success} /><View style={styles.infoContent}><Text style={styles.infoLabel}>Database</Text><Text style={styles.infoValue}>Firebase Firestore</Text></View></View></View>
-
-        <View style={[styles.section, { marginBottom: SPACING.xxxl }]}><Button title="Sign Out" onPress={handleSignOut} variant="outline" fullWidth size="large" loading={signingOut} icon={<Ionicons name="log-out-outline" size={18} color={COLORS.error} />} style={{ borderColor: COLORS.error }} textStyle={{ color: COLORS.error }} /></View>
+        <View style={styles.section}><Text style={styles.sectionTitle}>Quick Links</Text>
+          <TouchableOpacity style={styles.linkCard} onPress={() => navigation.navigate('Favorites')}><Ionicons name="heart-outline" size={20} color={COLORS.heart} /><Text style={styles.linkText}>My Favorites</Text><Text style={styles.linkCount}>{userProfile?.favorites?.length || 0}</Text><Ionicons name="chevron-forward" size={18} color={COLORS.textLight} /></TouchableOpacity>
+        </View>
+        <View style={[styles.section, { marginBottom: SPACING.xxxl }]}>
+          <Button title="Sign Out" onPress={handleSignOut} variant="outline" fullWidth size="large" loading={signingOut} icon={<Ionicons name="log-out-outline" size={18} color={COLORS.error} />} style={{ borderColor: COLORS.error }} textStyle={{ color: COLORS.error }} />
+        </View>
       </ScrollView>
     </View>
   );
