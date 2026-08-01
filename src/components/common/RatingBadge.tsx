@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SIZES } from '../../config/theme';
 
 interface RatingBadgeProps { rating: number; size?: 'small' | 'medium' | 'large'; showText?: boolean; }
@@ -14,4 +15,13 @@ export const RatingBadge: React.FC<RatingBadgeProps> = ({ rating, size = 'small'
   );
 };
 
-import { Ionicons } from '@expo/vector-icons';
+const styles = StyleSheet.create({
+  container: { flexDirection: 'row', alignItems: 'center', borderRadius: 6, paddingHorizontal: 6 },
+  container_small: { paddingVertical: 2 },
+  container_medium: { paddingVertical: 3 },
+  container_large: { paddingVertical: 4 },
+  text: { color: COLORS.white, fontWeight: '700', marginLeft: 3 },
+  text_small: { fontSize: SIZES.xs },
+  text_medium: { fontSize: SIZES.sm },
+  text_large: { fontSize: SIZES.base },
+});
