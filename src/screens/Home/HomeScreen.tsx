@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, StatusBar, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, SIZES, SPACING, RADIUS, SHADOWS } from '../../config/theme';
@@ -14,13 +14,15 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { Place } from '../../types';
 import { filterPlaces, sortPlaces } from '../../utils/helpers';
 
+const { width: screenWidth } = Dimensions.get('window');
+
 interface HomeScreenProps { navigation: any; }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  const { currentLocation, filters } = useAppState();
-  const { places, loading } = useRealtimePlaces(100);
+  const { currentLocation, filters, setFilters } = useAppState();
+  const { places, loading, error } = useRealtimePlaces(100);
   const { getCurrentLocation } = useLocation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Place['category'] | 'All'>('All');
@@ -40,16 +42,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   }, [places, currentLocation]);
 
   const onRefresh = useCallback(async () => { setRefreshing(true); await getCurrentLocation(); setRefreshing(false); }, [getCurrentLocation]);
-  const handleCategoryChange = useCallback((category: Place['category'] | 'All') => { setSelectedCategory(category); }, []);
 
-  if (loading && places.length === 0) return <LoadingScreen message="Discovering places near you..." />;
+  const handleCategoryChange = useCallback((category: Place['category'] | 'All') => { setSelectedCategory(category); }, []);
 
   const renderHeader = () => (
     <View>
       <TouchableOpacity style={styles.searchBar} onPress={() => navigation.navigate('Search')} activeOpacity={0.8}>
         <Ionicons name="search" size={20} color={COLORS.textSecondary} />
         <Text style={styles.searchPlaceholder}>Search hotels, resorts, restaurants...</Text>
-        <Ionicons name="options-outline" size={20} color={COLORS.primary} />
+        <TouchableOpacity onPress={() => navigation.navigate('Search')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}><Ionicons name="options-outline" size={20} color={COLORS.primary} /></TouchableOpacity>
       </TouchableOpacity>
       <CategoryBar selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
       {nearbyPlaces.length > 0 && (
@@ -72,6 +73,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     </View>
   );
 
+  if (loading && places.length === 0) return <LoadingScreen message="Discovering places near you..." />;
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
@@ -79,7 +82,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <View><Text style={styles.greeting}>Hello, {user?.displayName || 'Guest'} 👋</Text><Text style={styles.topSubtitle}>Find your perfect place</Text></View>
         <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('Profile')}><Ionicons name="person-circle-outline" size={36} color={COLORS.primary} /></TouchableOpacity>
       </View>
-      <FlatList data={filteredAndSortedPlaces} keyExtractor={(item) => item.id} renderItem={({ item }) => <PlaceCard place={item} variant="horizontal" showDistance />} ListHeaderComponent={renderHeader} ListEmptyComponent={<EmptyState icon="search-outline" title="No Places Found" message="Try changing your filters." />} contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} tintColor={COLORS.primary} />} ItemSeparatorComponent={() => <View style={{ height: SPACING.xs }} />} />
+      <FlatList data={filteredAndSortedPlaces} keyExtractor={(item) => item.id} renderItem={({ item }) => <PlaceCard place={item} variant="horizontal" showDistance />} ListHeaderComponent={renderHeader} ListEmptyComponent={<EmptyState icon="search-outline" title="No Places Found" message="Try changing your filters or search for something different." />} contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[COLORS.primary]} tintColor={COLORS.primary} />} ItemSeparatorComponent={() => <View style={{ height: SPACING.xs }} />} />
     </View>
   );
 };
