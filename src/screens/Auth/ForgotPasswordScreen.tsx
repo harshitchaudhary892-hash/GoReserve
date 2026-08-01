@@ -19,13 +19,10 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navi
     if (!email.trim()) { setError('Email is required'); return; }
     if (!/\S+@\S+\.\S+/.test(email)) { setError('Invalid email address'); return; }
     setLoading(true); setError('');
-    try {
-      await resetPassword(email.trim());
-      setSent(true);
-    } catch (err: any) {
+    try { await resetPassword(email.trim()); setSent(true); }
+    catch (err: any) {
       let message = 'Failed to send reset email.';
       if (err.code === 'auth/user-not-found') message = 'No account found with this email';
-      else if (err.code === 'auth/invalid-email') message = 'Invalid email address';
       setError(message);
     } finally { setLoading(false); }
   };
@@ -37,7 +34,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navi
         <View style={styles.header}>
           <View style={styles.iconContainer}><Ionicons name="key-outline" size={48} color={COLORS.primary} /></View>
           <Text style={styles.title}>{sent ? 'Check Your Email' : 'Forgot Password'}</Text>
-          <Text style={styles.subtitle}>{sent ? `We've sent a password reset link to ${email}. Please check your inbox.` : "Enter your email address and we'll send you a link to reset your password."}</Text>
+          <Text style={styles.subtitle}>{sent ? `We've sent a password reset link to ${email}.` : "Enter your email and we'll send you a reset link."}</Text>
         </View>
         {!sent ? (
           <View style={styles.form}>

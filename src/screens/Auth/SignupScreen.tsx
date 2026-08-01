@@ -34,23 +34,20 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
   const handleSignUp = async () => {
     if (!validate()) return;
     setLoading(true);
-    try {
-      await signUp(email.trim(), password, displayName.trim());
-    } catch (error: any) {
-      let message = 'Sign up failed. Please try again.';
+    try { await signUp(email.trim(), password, displayName.trim()); }
+    catch (error: any) {
+      let message = 'Sign up failed.';
       if (error.code === 'auth/email-already-in-use') message = 'An account with this email already exists';
       else if (error.code === 'auth/invalid-email') message = 'Invalid email address';
       else if (error.code === 'auth/weak-password') message = 'Password is too weak';
       Alert.alert('Sign Up Error', message);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Text style={styles.logoIcon}>🏨</Text>
           <Text style={styles.title}>Create Account</Text>
@@ -61,8 +58,13 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
           <Input label="Email" placeholder="Enter your email" value={email} onChangeText={(text) => { setEmail(text); if (errors.email) setErrors({ ...errors, email: '' }); }} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} error={errors.email} leftIcon={<Ionicons name="mail-outline" size={20} color={COLORS.textSecondary} />} />
           <Input label="Password" placeholder="Create a password (min. 6 characters)" value={password} onChangeText={(text) => { setPassword(text); if (errors.password) setErrors({ ...errors, password: '' }); }} secureTextEntry={!showPassword} error={errors.password} leftIcon={<Ionicons name="lock-closed-outline" size={20} color={COLORS.textSecondary} />} rightIcon={<TouchableOpacity onPress={() => setShowPassword(!showPassword)}><Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={COLORS.textSecondary} /></TouchableOpacity>} />
           <Input label="Confirm Password" placeholder="Re-enter your password" value={confirmPassword} onChangeText={(text) => { setConfirmPassword(text); if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: '' }); }} secureTextEntry={!showPassword} error={errors.confirmPassword} leftIcon={<Ionicons name="lock-closed-outline" size={20} color={COLORS.textSecondary} />} />
-          <View style={{ marginTop: SPACING.base }}><Button title="Sign Up" onPress={handleSignUp} loading={loading} fullWidth size="large" /></View>
-          <View style={styles.footer}><Text style={styles.footerText}>Already have an account? </Text><TouchableOpacity onPress={() => navigation.navigate('Login')}><Text style={styles.footerLink}>Sign In</Text></TouchableOpacity></View>
+          <View style={{ marginTop: SPACING.base }}>
+            <Button title="Sign Up" onPress={handleSignUp} loading={loading} fullWidth size="large" />
+          </View>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}><Text style={styles.footerLink}>Sign In</Text></TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
