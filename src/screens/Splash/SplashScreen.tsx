@@ -23,11 +23,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
       <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoIcon}>🏨</Text>
-          <Text style={styles.title}>Go Reserve</Text>
-          <Text style={styles.subtitle}>Discover & Reserve Nearby Places</Text>
-        </View>
+        <Text style={styles.logoIcon}>🏨</Text>
+        <Text style={styles.title}>Go Reserve</Text>
+        <Text style={styles.subtitle}>Discover & Reserve Nearby Places</Text>
       </Animated.View>
       <Text style={styles.footer}>Powered by Firebase</Text>
     </View>
@@ -37,9 +35,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center' },
   content: { alignItems: 'center' },
-  logoContainer: { alignItems: 'center' },
   logoIcon: { fontSize: 72, marginBottom: 16 },
   title: { fontSize: SIZES.title, fontWeight: '800', color: COLORS.white, letterSpacing: 1 },
-  subtitle: { fontSize: SIZES.base, color: 'rgba(255,255,255,0.8)', marginTop: 8, fontWeight: '400' },
+  subtitle: { fontSize: SIZES.base, color: 'rgba(255,255,255,0.8)', marginTop: 8 },
   footer: { position: 'absolute', bottom: 50, fontSize: SIZES.sm, color: 'rgba(255,255,255,0.5)' },
 });
